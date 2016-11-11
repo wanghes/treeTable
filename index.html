@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>treetable</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/jquery.treetable.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+<!--     <link rel="stylesheet" type="text/css" href="css/jquery.treetable.theme.default.css"> -->
+    <style type="text/css">
+
+    </style>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.treetable.js"></script>
+</head>
+<body>
+<div id="loadingImage" style="display: none">
+    <img src="images/FhHRx.gif" />
+</div>
+<div class="btn_wrap">
+  <a href="#" class="btn btn-primary" onclick="jQuery('#example-basic').treetable('expandAll');  return false;">展开</a>
+  <a href="#" class="btn btn-primary" onclick="jQuery('#example-basic').treetable('collapseAll'); return false;">收缩</a>
+  </div>
+<table class="table table-striped table-bordered" id="example-basic" >
+    <thead>
+      <tr>
+        <th>统计周期</th>
+        <th>机构</th>
+        <th>累积充值（元）</th>
+        <th>累计分配（元）</th>
+        <th>累计消费（元）</th>
+        <th>累计加油量（L）</th>
+        <th>累计加油次数</th>
+      </tr>
+    </thead>
+    <tbody id="tBodyGen">
+     <!--  <tr data-tt-id="1" data-tt-branch='true'>
+       <td>1: column 1</td>
+       <td>1: column 2</td>
+     </tr>
+
+     <tr data-tt-id="2" data-tt-branch='true'>
+       <td>2: column 1</td>
+       <td>2: column 2</td>
+     </tr>
+
+     <tr data-tt-id="3" data-tt-branch='true'>
+       <td>3: column 1</td>
+       <td>3: column 2</td>
+     </tr> -->
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+<script type="text/javascript">
+var result =  {
+    "2000BG": {
+        orgcode: "2000BG",
+        parent_code: "2000BG",
+        org_name: "上海则一货运有限公司",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0F": {
+        orgcode: "2000BG0F",
+        parent_code: "2000BG",
+        org_name: "小熊猫",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0F01": {
+        orgcode: "2000BG0F01",
+        parent_code: "2000BG0F",
+        org_name: "上海",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0F05": {
+        orgcode: "2000BG0F05",
+        parent_code: "2000BG0F",
+        org_name: "济南",
+        hasG7s: 1,
+        charge_total: "0.00",
+        assign_total: "0.00",
+        total_trade_money: "5492.06",
+        total_trade_num: "1045.86",
+        counts: 6
+    },
+    "2000BG0G": {
+        orgcode: "2000BG0G",
+        parent_code: "2000BG",
+        org_name: "北京",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0G01": {
+        orgcode: "2000BG0G01",
+        parent_code: "2000BG0G",
+        org_name: "北京",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0G0101": {
+        orgcode: "2000BG0G0101",
+        parent_code: "2000BG0G01",
+        org_name: "北京铁路",
+        hasG7s: 1,
+        charge_total: 3,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0G0102": {
+        orgcode: "2000BG0G0102",
+        parent_code: "2000BG0G01",
+        org_name: "北京干线",
+        hasG7s: 1,
+        charge_total: 2,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0H": {
+        orgcode: "2000BG0H",
+        parent_code: "2000BG",
+        org_name: "大熊猫",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0H01": {
+        orgcode: "2000BG0H01",
+        parent_code: "2000BG0H",
+        org_name: "广州",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0H04": {
+        orgcode: "2000BG0H04",
+        parent_code: "2000BG0H",
+        org_name: "泉州",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0I": {
+        orgcode: "2000BG0I",
+        parent_code: "2000BG",
+        org_name: "大兴安岭",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0I04": {
+        orgcode: "2000BG0I04",
+        parent_code: "2000BG0I",
+        org_name: "太原",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0J": {
+        orgcode: "2000BG0J",
+        parent_code: "2000BG",
+        org_name: "华中区",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0J01": {
+        orgcode: "2000BG0J01",
+        parent_code: "2000BG0J",
+        org_name: "武汉",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0J02": {
+        orgcode: "2000BG0J02",
+        parent_code: "2000BG0J",
+        org_name: "郑州",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0J03": {
+        orgcode: "2000BG0J03",
+        parent_code: "2000BG0J",
+        org_name: "长沙",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0J04": {
+        orgcode: "2000BG0J04",
+        parent_code: "2000BG0J",
+        org_name: "南昌",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0K": {
+        orgcode: "2000BG0K",
+        parent_code: "2000BG",
+        org_name: "西南区",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0K01": {
+        orgcode: "2000BG0K01",
+        parent_code: "2000BG0K",
+        org_name: "成都",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0K02": {
+        orgcode: "2000BG0K02",
+        parent_code: "2000BG0K",
+        org_name: "重庆",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0K03": {
+        orgcode: "2000BG0K03",
+        parent_code: "2000BG0K",
+        org_name: "昆明",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0K04": {
+        orgcode: "2000BG0K04",
+        parent_code: "2000BG0K",
+        org_name: "贵阳",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0L": {
+        orgcode: "2000BG0L",
+        parent_code: "2000BG",
+        org_name: "哈尔滨工厂",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0L01": {
+        orgcode: "2000BG0L01",
+        parent_code: "2000BG0L",
+        org_name: "沈阳",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0X": {
+        orgcode: "2000BG0X",
+        parent_code: "2000BG",
+        org_name: "通州北苑",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    },
+    "2000BG0X01": {
+        orgcode: "2000BG0X01",
+        parent_code: "2000BG0X",
+        org_name: "杭州",
+        hasG7s: 1,
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
+    }
+};
+
+
+function deepCopy(p, c) {
+　　　　var c = c || {};
+　　　　for (var i in p) {
+　　　　　　if (typeof p[i] === 'object') {
+　　　　　　　　c[i] = (p[i].constructor === Array) ? [] : {};
+　　　　　　　　deepCopy(p[i], c[i]);
+　　　　　　} else {
+　　　　　　　　　c[i] = p[i];
+　　　　　　}
+　　　　}
+　　　　return c;
+　　}
+
+function generateFormatArray(obj){
+    for(var key in obj){
+        obj[key].childNodeType = "leaf";
+        obj[key].childData = [
+            "",
+            obj[key].org_name,
+            obj[key].charge_total,
+            obj[key].assign_total,
+            obj[key].total_trade_money,
+            obj[key].total_trade_num,
+            obj[key].counts,
+        ];
+    }
+    return obj;
+}
+var initFormatObj = generateFormatArray(result);
+var copyArrs = deepCopy(initFormatObj);
+var vals = deepCopy(copyArrs);
+var vals2 = deepCopy(copyArrs);
+
+function createKeysArr(formatObj){
+    var tempArray = [];
+    var arrKeys = [];
+    var tempP = '';
+    for(var key in formatObj){
+        tempArray.push(formatObj[key].parent_code);
+    }
+    arrKeys[arrKeys.length] = tempArray[0];
+    var len = tempArray.length;
+    for(var i=1; i<len; i++){
+        if(tempArray.indexOf(tempArray[i])==i){
+            arrKeys.push(tempArray[i]);
+        }
+    }
+
+    return arrKeys;
+}
+
+
+var arrKeys = createKeysArr(copyArrs);
+
+var dateInfo = "2016-10";
+
+function createBranchLeaf(arrKeys,copyArrs){
+    var resultVals;
+    arrKeys.forEach(function(item){
+        copyArrs[item].childNodeType = 'branch';
+        var len = copyArrs[item].childData.len;
+        resultVals = copyArrs[item].childData.splice(0,2);
+        copyArrs[item].childData = resultVals.concat(selectResult(item,arrKeys,vals2));
+        //console.log(copyArrs[item].childData);
+    });
+
+    return copyArrs;
+}
+
+function handleResult(arrKeys,vals){
+    var len=0;
+    var arr = [];
+    for(var i =0; i<arrKeys.length; i++){
+            len = arrKeys[i].length;
+            arr.push([i,len]);
+    }
+    arr.sort (function (first, second){
+         var f = parseInt (first[1], 10), s = parseInt (second[1], 10);
+        if (f < s) {
+            return 1;
+        } else if (f > s) {
+            return -1;
+        } else {
+            return 0;
+        }
+    });
+    arr = arr.map(function(item){
+        return arrKeys[item[0]];
+    });
+
+    var allArrs = [];
+    arr.forEach(function(parent_code){
+        var newArr=[];
+        for(var key in vals){
+            if(vals[key].parent_code == parent_code){
+                vals[key].childData.splice(0,2);
+                newArr[newArr.length] = vals[key].childData;
+            }
+        }
+        newArr[newArr.length] = parent_code;
+        allArrs.push(newArr);
+    });
+
+    return allArrs;
+}
+
+
+
+/*按照底层顺讯累加计算*/
+function countResult(arrKeys,vals){
+    var result = {};
+    var allCountArrs = handleResult(arrKeys,vals);
+
+    var val1,val2,val3,val4,val5;
+    var arr = allCountArrs.map(function(item){
+         var key = item.pop();
+
+         for(var i=0; i<item.length; i++){
+            val1 = val2 = val3 = val4 = val5 = 0;
+            item[i].forEach(function(num,index){
+                num = parseFloat(num);
+                switch(index){
+                    case 0:
+                    val1 +=num;
+                    break;
+                     case 1:
+                    val2 +=num;
+                    break;
+                     case 2:
+                    val3 +=num;
+                    break;
+                     case 3:
+                    val4 +=num;
+                    break;
+                     case 4:
+                    val5 +=num;
+                    break;
+                }
+
+            });
+
+
+         }
+         result[key] = [val1,val2,val3,val4,val5];
+
+    });
+
+    return result;
+}
+
+function selectResult(parent_code,arrKeys,vals){
+    var result = countResult(arrKeys,vals);
+    var rval;
+    for(var key in result){
+        // console.log(result[key]);
+        if(parent_code==key){
+
+            rval = result[key];
+            break;
+        }
+    }
+
+    return rval;
+}
+
+var zhi = selectResult("2000BG0F",arrKeys,vals);
+
+console.log(zhi)
+var formatObj = createBranchLeaf(arrKeys,copyArrs);
+
+function joinJson(arrKeys,formatObj){
+    var jsonData = {};
+    for(var key in formatObj){
+        if(formatObj[key].parent_code == formatObj[key].orgcode){
+            jsonData.rootId = {
+                orgcode:formatObj[key].parent_code,
+                date:dateInfo,
+                org_name:formatObj[key].org_name,
+                charge_total:formatObj[key].charge_total,
+                assign_total:formatObj[key].assign_total,
+                total_trade_money:formatObj[key].total_trade_money,
+                total_trade_num:formatObj[key].total_trade_num,
+                counts:formatObj[key].counts
+            }
+            delete formatObj[key];
+        }
+    }
+    jsonData.nodeID = infoArr(arrKeys,formatObj);
+    return jsonData;
+}
+
+function infoArr(arrKeys,formatObj){
+    var json = {};
+    var len = arrKeys.length;
+    arrKeys.forEach(function(item,index){
+        for(var key in formatObj){
+            if(item == formatObj[key].parent_code){
+                if(!json[item]){
+                    json[item] = [];
+                }
+                json[item].push(formatObj[key]);
+            }
+        }
+    });
+    return json;
+}
+
+
+var jsonData = joinJson(arrKeys,formatObj);
+/*console.log(jsonData);*/
+/*var jsonData = {
+    rootId:{
+            ID:"root",
+            date:'2016-10',
+            text:"统计总额",
+            chargeAll:'900000',
+            aloAll:'89000',
+            costAll:'230000',
+            oilAll:'400000',
+            oilTimes:'235400'
+    },
+    "nodeID": {
+        "root":[
+            {
+                ID:"0000SF",
+                "childNodeType": "branch",
+                "childData": [
+                    "",
+                    "顺丰集团",
+                    '50000',
+                    '49000',
+                    '48750',
+                    '22000',
+                    '1000'
+                ]
+            },
+            {
+                ID:"0000YD",
+                 "childNodeType": "leaf",
+                 "childData": [
+                    "",
+                    "韵达集团",
+                    '50000',
+                    '49000',
+                    '48750',
+                    '22000',
+                    '1000'
+                ]
+            },
+            {
+                ID:"0000JD",
+                "childNodeType": "leaf",
+                "childData": [
+                    "",
+                    "京东集团",
+                    '50000',
+                    '49000',
+                    '48750',
+                    '22000',
+                    '1000'
+                ]
+            }
+        ],
+        "0000SF": [
+           {"ID": "0000SFBJ",
+            "childNodeType": "branch",
+            "childData": [
+                "",
+                "顺丰北京分公司",
+                "30000",
+                "20000",
+                "112233",
+                "123213",
+                "123232"
+              ]
+          },
+          {"ID": "0000SFNJ",
+            "childNodeType": "leaf",
+            "childData": [
+                "",
+                "顺丰南京分公司",
+                "30000",
+                "20000",
+                "112233",
+                "123213",
+                "123232"
+              ]
+          },
+          {"ID":"0000SFDL",
+            "childNodeType": "leaf",
+            "childData": [
+                "",
+                "顺丰大连分公司",
+                "30000",
+                "20000",
+                "112233",
+                "123213",
+                "123232"
+              ]
+          }
+        ],
+        "0000SFBJ": [
+            {"ID":"0000SFBJ01",
+              "childNodeType": "leaf",
+              "childData": [
+                    "",
+                    "雷庆车队",
+                    "30000",
+                    "20000",
+                    "112233",
+                    "123213",
+                    "123232"
+                ]
+            },
+            {"ID":"0000SFBJ02",
+              "childNodeType": "leaf",
+              "childData": [
+                    "",
+                    "少谦车队",
+                    "30000",
+                    "20000",
+                    "112233",
+                    "123213",
+                    "123232"
+                ]
+            }
+        ]
+    }
+};*/
+
+$(function(){
+    var tBodyGen = $('#tBodyGen');
+    var str = '';
+    str += '<tr data-tt-id="'+jsonData.rootId.orgcode+'" data-tt-branch="true"><td>'+jsonData.rootId.date+'</td>';
+    str += '<td>'+jsonData.rootId.org_name+'</td>';
+    str += '<td><a href="#">'+jsonData.rootId.charge_total+'</a></td>';
+    str += '<td><a href="#">'+jsonData.rootId.assign_total+'</a></td>';
+    str += '<td><a href="#">'+jsonData.rootId.total_trade_money+'</a></td>';
+    str += '<td><a href="#">'+jsonData.rootId.total_trade_num+'</a></td>';
+    str += '<td><a href="#">'+jsonData.rootId.counts+'</a></td>';
+    str += '</tr>';
+
+    tBodyGen.html(str);
+
+    $("#example-basic").treetable({
+        expandable:     true,
+        onNodeExpand:   nodeExpand,
+        onNodeCollapse: nodeCollapse,
+        column:1
+    });
+
+    $("#example-basic").treetable("reveal", '1');
+
+
+    $("#example-basic tbody").on("mousedown", "tr", function() {
+        $(".selected").not(this).removeClass("selected");
+        $(this).toggleClass("selected");
+    });
+
+    function nodeExpand () {
+        //console.log("Expanded: " + this.id);
+        getNodeViaAjax(this.id);
+    }
+
+
+    function nodeCollapse () {
+        // alert("Collapsed: " + this.id);
+    }
+
+
+    function getNodeViaAjax(parentNodeID) {
+        var childNodes = jsonData.nodeID[parentNodeID];
+
+        if(childNodes) {
+            var parentNode = $("#example-basic").treetable("node", parentNodeID);
+
+            for (var i = 0; i < childNodes.length; i++) {
+                var node = childNodes[i];
+                console.log(node);
+                var nodeToAdd = $("#example-basic").treetable("node",node['orgcode']);
+
+                if(!nodeToAdd) {
+                    var row ='<tr data-tt-id="' +
+                        node['orgcode'] +
+                        '" data-tt-parent-id="' +
+                        parentNodeID + '" ';
+                    if(node['childNodeType'] == 'branch') {
+                        row += ' data-tt-branch="true" ';
+                    }
+                    row += ' >';
+
+                    for (var index in node['childData']) {
+                        var data = node['childData'][index];
+                        if(!isNaN(parseFloat(data))){
+                            row += "<td><a href='#'>" + data + "</a></td>";
+                        }else{
+                            row += "<td><em class='text_title'>" + data + "</em></td>";
+                        }
+                    }
+
+                    row +="</tr>";
+
+                    $("#example-basic").treetable("loadBranch", parentNode, row);
+                }
+
+            }
+
+        }
+
+
+
+
+
+    }
+});
+
+
+
+
+
+
+</script>

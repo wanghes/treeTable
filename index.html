@@ -128,10 +128,10 @@ var result =  {
         org_name: "北京铁路",
         hasG7s: 1,
         charge_total: 3,
-        assign_total: 0,
-        total_trade_money: 0,
-        total_trade_num: 0,
-        counts: 0
+        assign_total: 2,
+        total_trade_money: 4,
+        total_trade_num: 4,
+        counts: 9
     },
     "2000BG0G0102": {
         orgcode: "2000BG0G0102",
@@ -139,10 +139,32 @@ var result =  {
         org_name: "北京干线",
         hasG7s: 1,
         charge_total: 2,
-        assign_total: 0,
-        total_trade_money: 0,
-        total_trade_num: 0,
-        counts: 0
+        assign_total: 1,
+        total_trade_money: 4,
+        total_trade_num: 6,
+        counts: 7
+    },
+    "2000BG0G010201": {
+        orgcode: "2000BG0G010201",
+        parent_code: "2000BG0G0102",
+        org_name: "北京干线1",
+        hasG7s: 1,
+        charge_total: 2,
+        assign_total: 1,
+        total_trade_money: 4,
+        total_trade_num: 6,
+        counts: 7
+    },
+     "2000BG0G010202": {
+        orgcode: "2000BG0G010202",
+        parent_code: "2000BG0G0102",
+        org_name: "北京干线2",
+        hasG7s: 1,
+        charge_total: 2,
+        assign_total: 1,
+        total_trade_money: 4,
+        total_trade_num: 6,
+        counts: 7
     },
     "2000BG0H": {
         orgcode: "2000BG0H",
@@ -417,7 +439,9 @@ function createBranchLeaf(arrKeys,copyArrs){
     arrKeys.forEach(function(item){
         copyArrs[item].childNodeType = 'branch';
         var len = copyArrs[item].childData.len;
+        var vals2 = deepCopy(copyArrs);
         resultVals = copyArrs[item].childData.splice(0,2);
+        var newArr = selectResult(item,arrKeys,vals2);
         copyArrs[item].childData = resultVals.concat(selectResult(item,arrKeys,vals2));
         //console.log(copyArrs[item].childData);
     });
@@ -432,6 +456,7 @@ function handleResult(arrKeys,vals){
             len = arrKeys[i].length;
             arr.push([i,len]);
     }
+
     arr.sort (function (first, second){
          var f = parseInt (first[1], 10), s = parseInt (second[1], 10);
         if (f < s) {
@@ -442,6 +467,7 @@ function handleResult(arrKeys,vals){
             return 0;
         }
     });
+
     arr = arr.map(function(item){
         return arrKeys[item[0]];
     });
@@ -451,8 +477,7 @@ function handleResult(arrKeys,vals){
         var newArr=[];
         for(var key in vals){
             if(vals[key].parent_code == parent_code){
-                vals[key].childData.splice(0,2);
-                newArr[newArr.length] = vals[key].childData;
+                newArr[newArr.length] = vals[key].childData.slice(2);
             }
         }
         newArr[newArr.length] = parent_code;
@@ -463,44 +488,23 @@ function handleResult(arrKeys,vals){
 }
 
 
-
 /*按照底层顺讯累加计算*/
 function countResult(arrKeys,vals){
     var result = {};
     var allCountArrs = handleResult(arrKeys,vals);
 
-    var val1,val2,val3,val4,val5;
     var arr = allCountArrs.map(function(item){
-         var key = item.pop();
-
-         for(var i=0; i<item.length; i++){
-            val1 = val2 = val3 = val4 = val5 = 0;
-            item[i].forEach(function(num,index){
-                num = parseFloat(num);
-                switch(index){
-                    case 0:
-                    val1 +=num;
-                    break;
-                     case 1:
-                    val2 +=num;
-                    break;
-                     case 2:
-                    val3 +=num;
-                    break;
-                     case 3:
-                    val4 +=num;
-                    break;
-                     case 4:
-                    val5 +=num;
-                    break;
-                }
-
+        var key = item.pop();
+        var all = [];
+        var total = [0,0,0,0,0];
+        item.forEach(function(value){
+            total.forEach(function(val,index){
+                total[index] += value[index];
             });
+        })
 
-
-         }
-         result[key] = [val1,val2,val3,val4,val5];
-
+        result[key] = total;
+        total = 0;
     });
 
     return result;
@@ -508,22 +512,19 @@ function countResult(arrKeys,vals){
 
 function selectResult(parent_code,arrKeys,vals){
     var result = countResult(arrKeys,vals);
+
     var rval;
     for(var key in result){
-        // console.log(result[key]);
         if(parent_code==key){
-
             rval = result[key];
-            break;
         }
     }
-
     return rval;
 }
 
-var zhi = selectResult("2000BG0F",arrKeys,vals);
+//var zhi = selectResult("2000BG0G01",arrKeys,vals);
 
-console.log(zhi)
+//console.log(zhi)
 var formatObj = createBranchLeaf(arrKeys,copyArrs);
 
 function joinJson(arrKeys,formatObj){
@@ -734,7 +735,7 @@ $(function(){
 
             for (var i = 0; i < childNodes.length; i++) {
                 var node = childNodes[i];
-                console.log(node);
+/*                console.log(node);*/
                 var nodeToAdd = $("#example-basic").treetable("node",node['orgcode']);
 
                 if(!nodeToAdd) {

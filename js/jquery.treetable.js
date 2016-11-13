@@ -578,7 +578,7 @@
       if (node) {
         node.reveal();
       } else {
-        throw new Error("Unknown node '" + id + "'");
+        //throw new Error("Unknown node '" + id + "'");
       }
 
       return this;

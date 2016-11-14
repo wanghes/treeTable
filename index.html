@@ -85,7 +85,7 @@ var result =  {
         hasG7s: 1,
         charge_total: 0,
         assign_total: 0,
-        total_trade_money: 0,
+        total_trade_money: "3.17",
         total_trade_num: 0,
         counts: 0
     },
@@ -138,18 +138,18 @@ var result =  {
         parent_code: "2000BG0G01",
         org_name: "北京干线",
         hasG7s: 1,
-        charge_total: 2,
-        assign_total: 1,
-        total_trade_money: 4,
-        total_trade_num: 6,
-        counts: 7
+        charge_total: 0,
+        assign_total: 0,
+        total_trade_money: 0,
+        total_trade_num: 0,
+        counts: 0
     },
     "2000BG0G010201": {
         orgcode: "2000BG0G010201",
         parent_code: "2000BG0G0102",
         org_name: "北京干线1",
         hasG7s: 1,
-        charge_total: 2,
+        charge_total: 2.01,
         assign_total: 1,
         total_trade_money: 4,
         total_trade_num: 6,
@@ -182,7 +182,7 @@ var result =  {
         parent_code: "2000BG0H",
         org_name: "广州",
         hasG7s: 1,
-        charge_total: 0,
+        charge_total: 1,
         assign_total: 0,
         total_trade_money: 0,
         total_trade_num: 0,
@@ -193,7 +193,7 @@ var result =  {
         parent_code: "2000BG0H",
         org_name: "泉州",
         hasG7s: 1,
-        charge_total: 0,
+        charge_total: 2,
         assign_total: 0,
         total_trade_money: 0,
         total_trade_num: 0,
@@ -377,19 +377,19 @@ var result =  {
     }
 };
 
-
-function deepCopy(p, c) {
-　　　　var c = c || {};
-　　　　for (var i in p) {
-　　　　　　if (typeof p[i] === 'object') {
-　　　　　　　　c[i] = (p[i].constructor === Array) ? [] : {};
-　　　　　　　　deepCopy(p[i], c[i]);
-　　　　　　} else {
-　　　　　　　　　c[i] = p[i];
-　　　　　　}
-　　　　}
-　　　　return c;
-　　}
+/**深拷贝**/
+function deepCopy(origin, copy) {
+    var copy = copy || {};
+    for (var i in origin) {
+        if (typeof origin[i] === 'object') {
+            copy[i] = (origin[i].constructor === Array) ? [] : {};
+            deepCopy(origin[i], copy[i]);
+        } else {
+            copy[i] = origin[i];
+        }
+    }
+    return copy;
+}
 
 function generateFormatArray(obj){
     for(var key in obj){
@@ -397,19 +397,16 @@ function generateFormatArray(obj){
         obj[key].childData = [
             "",
             obj[key].org_name,
-            obj[key].charge_total,
-            obj[key].assign_total,
-            obj[key].total_trade_money,
-            obj[key].total_trade_num,
-            obj[key].counts,
+            parseFloat(obj[key].charge_total).toFixed(2),
+            parseFloat(obj[key].assign_total).toFixed(2),
+            parseFloat(obj[key].total_trade_money).toFixed(2),
+            parseFloat(obj[key].total_trade_num).toFixed(2),
+            obj[key].counts
         ];
     }
     return obj;
 }
-var initFormatObj = generateFormatArray(result);
-var copyArrs = deepCopy(initFormatObj);
-var vals = deepCopy(copyArrs);
-var vals2 = deepCopy(copyArrs);
+
 
 function createKeysArr(formatObj){
     var tempArray = [];
@@ -425,36 +422,16 @@ function createKeysArr(formatObj){
             arrKeys.push(tempArray[i]);
         }
     }
-
     return arrKeys;
 }
 
-
-var arrKeys = createKeysArr(copyArrs);
-
-var dateInfo = "2016-10";
-
-function createBranchLeaf(arrKeys,copyArrs){
-    var resultVals;
-    arrKeys.forEach(function(item){
-        copyArrs[item].childNodeType = 'branch';
-        var len = copyArrs[item].childData.len;
-        var vals2 = deepCopy(copyArrs);
-        resultVals = copyArrs[item].childData.splice(0,2);
-        var newArr = selectResult(item,arrKeys,vals2);
-        copyArrs[item].childData = resultVals.concat(selectResult(item,arrKeys,vals2));
-        //console.log(copyArrs[item].childData);
-    });
-
-    return copyArrs;
-}
 
 function handleResult(arrKeys,vals){
     var len=0;
     var arr = [];
     for(var i =0; i<arrKeys.length; i++){
-            len = arrKeys[i].length;
-            arr.push([i,len]);
+        len = arrKeys[i].length;
+        arr.push([i,len]);
     }
 
     arr.sort (function (first, second){
@@ -477,6 +454,7 @@ function handleResult(arrKeys,vals){
         var newArr=[];
         for(var key in vals){
             if(vals[key].parent_code == parent_code){
+                vals[key].childData.push(vals[key].orgcode)
                 newArr[newArr.length] = vals[key].childData.slice(2);
             }
         }
@@ -490,29 +468,68 @@ function handleResult(arrKeys,vals){
 
 /*按照底层顺讯累加计算*/
 function countResult(arrKeys,vals){
-    var result = {};
+    var result = {},total;
     var allCountArrs = handleResult(arrKeys,vals);
 
-    var arr = allCountArrs.map(function(item){
-        var key = item.pop();
-        var all = [];
-        var total = [0,0,0,0,0];
-        item.forEach(function(value){
-            total.forEach(function(val,index){
-                total[index] += value[index];
-            });
-        })
+    var allLen = allCountArrs.length;
+    var item,key,index=0;
+     if(allLen==0){ return; }
 
+    while(index<allLen){
+        item = allCountArrs[index];
+        key = item[item.length-1];
+        item = item.slice(0,item.length-1);
+        total = [0.00,0.00,0.00,0.00,0.00];
+
+        item.forEach(function(value){
+            total.forEach(function(val,idx){
+                //value[idx] = parseFloat(value[idx]).toFixed(2);
+                total[idx] += parseFloat(value[idx]);
+            });
+
+        });
+        total = total.map(function(item,inx){
+            if(inx==4){
+                return item;
+            }
+            return parseFloat(item).toFixed(2);
+        })
+        //console.log(total)
+        allCountArrs = countAppointValue(allCountArrs,key,total);
         result[key] = total;
-        total = 0;
-    });
+        index++;
+    }
 
     return result;
 }
 
+function countAppointValue(allCountArrs,key,total){
+   var compareKey = key.slice(0,-2);
+   //console.log('compareKey:'+compareKey+"-old:"+key)
+    allCountArrs = allCountArrs.map(function(item){
+       //console.log("selfKey:"+item[item.length-1])
+        var selfKey = item[item.length-1];
+        if(compareKey==selfKey){
+            var value = item.slice(0,item.length-1);
+            item = item.map(function(val){
+                if(typeof val == 'string'){
+                    return val;
+                }else{
+                    if(val[val.length-1] == key){
+                        val = total.concat(key);
+                    }
+                    return val;
+                }
+            });
+        }
+        return item;
+    })
+
+    return allCountArrs;
+}
+
 function selectResult(parent_code,arrKeys,vals){
     var result = countResult(arrKeys,vals);
-
     var rval;
     for(var key in result){
         if(parent_code==key){
@@ -522,30 +539,16 @@ function selectResult(parent_code,arrKeys,vals){
     return rval;
 }
 
-//var zhi = selectResult("2000BG0G01",arrKeys,vals);
-
-//console.log(zhi)
-var formatObj = createBranchLeaf(arrKeys,copyArrs);
-
-function joinJson(arrKeys,formatObj){
-    var jsonData = {};
-    for(var key in formatObj){
-        if(formatObj[key].parent_code == formatObj[key].orgcode){
-            jsonData.rootId = {
-                orgcode:formatObj[key].parent_code,
-                date:dateInfo,
-                org_name:formatObj[key].org_name,
-                charge_total:formatObj[key].charge_total,
-                assign_total:formatObj[key].assign_total,
-                total_trade_money:formatObj[key].total_trade_money,
-                total_trade_num:formatObj[key].total_trade_num,
-                counts:formatObj[key].counts
-            }
-            delete formatObj[key];
-        }
-    }
-    jsonData.nodeID = infoArr(arrKeys,formatObj);
-    return jsonData;
+function createBranchLeaf(arrKeys,copyArrs){
+    var resultVals,len,formatArrs;
+    arrKeys.forEach(function(item){
+        copyArrs[item].childNodeType = 'branch';
+        len = copyArrs[item].childData.len;
+        formatArrs = deepCopy(initFormatObj);
+        resultVals = copyArrs[item].childData.splice(0,2);
+        copyArrs[item].childData = resultVals.concat(selectResult(item,arrKeys,formatArrs));
+    });
+    return copyArrs;
 }
 
 function infoArr(arrKeys,formatObj){
@@ -557,16 +560,63 @@ function infoArr(arrKeys,formatObj){
                 if(!json[item]){
                     json[item] = [];
                 }
-                json[item].push(formatObj[key]);
+                if(formatObj[key].parent_code == formatObj[key].orgcode){
+                    json['root'] = formatObj[key];
+                }else{
+                    json[item].push(formatObj[key]);
+                }
             }
         }
     });
     return json;
 }
 
+function joinJson(arrKeys,formatObj){
+    var jsonData = {};
+    jsonData.nodeID = infoArr(arrKeys,formatObj);
+    jsonData.nodeID.root = [];
+    for(var key in formatObj){
+        if(formatObj[key].parent_code == formatObj[key].orgcode){
+            var alone = selectResult(formatObj[key].parent_code,arrKeys,vals);
+            jsonData.nodeID.root.push({
+                orgcode:formatObj[key].orgcode,
+                childNodeType:formatObj[key].childNodeType,
+                parent_code:"root",
+                childData:[
+                    formatObj[key].childData[0],
+                    formatObj[key].childData[1],
+                    alone[0],
+                    alone[1],
+                    alone[2],
+                    alone[3],
+                    alone[4]
+                ]
+            });
+        }
+    }
 
+    jsonData.rootId = {
+        orgcode:"root",
+        date:dateInfo,
+        org_name:"统计总额",
+        charge_total:alone[0],
+        assign_total:alone[1],
+        total_trade_money:alone[2],
+        total_trade_num:alone[3],
+        counts:alone[4]
+    }
+    return jsonData;
+}
+
+
+var initFormatObj = generateFormatArray(result); /**格式化结果集**/
+var copyArrs = deepCopy(initFormatObj);
+var vals = deepCopy(initFormatObj);
+var arrKeys = createKeysArr(copyArrs);
+var dateInfo = "2016-10"; /*ajax查询字段*/
+var formatObj = createBranchLeaf(arrKeys,copyArrs);
 var jsonData = joinJson(arrKeys,formatObj);
-/*console.log(jsonData);*/
+console.log(jsonData);
 /*var jsonData = {
     rootId:{
             ID:"root",
@@ -663,7 +713,7 @@ var jsonData = joinJson(arrKeys,formatObj);
               "childNodeType": "leaf",
               "childData": [
                     "",
-                    "雷庆车队",
+                    "顺丰北京车队01",
                     "30000",
                     "20000",
                     "112233",
@@ -675,7 +725,7 @@ var jsonData = joinJson(arrKeys,formatObj);
               "childNodeType": "leaf",
               "childData": [
                     "",
-                    "少谦车队",
+                    "顺丰北京车队02",
                     "30000",
                     "20000",
                     "112233",
@@ -710,7 +760,6 @@ $(function(){
 
     $("#example-basic").treetable("reveal", '1');
 
-
     $("#example-basic tbody").on("mousedown", "tr", function() {
         $(".selected").not(this).removeClass("selected");
         $(this).toggleClass("selected");
@@ -721,11 +770,9 @@ $(function(){
         getNodeViaAjax(this.id);
     }
 
-
     function nodeCollapse () {
         // alert("Collapsed: " + this.id);
     }
-
 
     function getNodeViaAjax(parentNodeID) {
         var childNodes = jsonData.nodeID[parentNodeID];
@@ -735,7 +782,6 @@ $(function(){
 
             for (var i = 0; i < childNodes.length; i++) {
                 var node = childNodes[i];
-/*                console.log(node);*/
                 var nodeToAdd = $("#example-basic").treetable("node",node['orgcode']);
 
                 if(!nodeToAdd) {
@@ -758,24 +804,13 @@ $(function(){
                     }
 
                     row +="</tr>";
-
                     $("#example-basic").treetable("loadBranch", parentNode, row);
                 }
 
             }
-
         }
-
-
-
-
-
     }
 });
-
-
-
-
 
 
 </script>

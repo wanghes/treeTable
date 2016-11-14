@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>treetable</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/jquery.treetable.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+<!--     <link rel="stylesheet" type="text/css" href="css/jquery.treetable.theme.default.css"> -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.treetable.js"></script>
+</head>
+<body>
+<div id="loadingImage" style="display: none">
+    <img src="images/FhHRx.gif" />
+</div>
+<div class="btn_wrap">
+  <a href="#" class="btn btn-primary" onclick="jQuery('#example-basic').treetable('expandAll');  return false;">展开</a>
+  <a href="#" class="btn btn-primary" onclick="jQuery('#example-basic').treetable('collapseAll'); return false;">收缩</a>
+  </div>
+<table class="table table-striped table-bordered" id="example-basic" >
+    <thead>
+      <tr>
+        <th>统计周期</th>
+        <th>机构</th>
+        <th>累积充值（元）</th>
+        <th>累计分配（元）</th>
+        <th>累计消费（元）</th>
+        <th>累计加油量（L）</th>
+        <th>累计加油次数</th>
+      </tr>
+    </thead>
+    <tbody id="tBodyGen">
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+<script type="text/javascript">
+var postData = {
+    rootId:{
+        ID:"root",
+        date:'2016-10',
+        text:"统计总额",
+        chargeAll:'900000',
+        aloAll:'200000',
+        costAll:'200000',
+        oilAll:'400000',
+        oilTimes:'300'
+    },
+    "nodeID": {
+        "root":[
+            {
+                ID:"0000SF",
+                "childNodeType": "branch",
+                "childData": [
+                    "",
+                    "顺丰集团",
+                    '300000',
+                    '100000',
+                    '80000',
+                    '200000',
+                    '100'
+                ]
+            },
+            {
+                ID:"0000YD",
+                 "childNodeType": "leaf",
+                 "childData": [
+                    "",
+                    "韵达集团",
+                    '300000',
+                    '50000',
+                    '40000',
+                    '100000',
+                    '100'
+                ]
+            },
+            {
+                ID:"0000JD",
+                "childNodeType": "leaf",
+                "childData": [
+                    "",
+                    "京东集团",
+                    '300000',
+                    '50000',
+                    '80000',
+                    '100000',
+                    '100'
+                ]
+            }
+        ],
+        "0000SF": [
+            {
+                "ID": "0000SFBJ",
+                "childNodeType": "branch",
+                "childData": [
+                    "",
+                    "顺丰北京分公司",
+                    "150000",
+                    "60000",
+                    "40000",
+                    "100000",
+                    "50"
+                  ]
+            },
+            {
+                "ID": "0000SFNJ",
+                "childNodeType": "leaf",
+                "childData": [
+                    "",
+                    "顺丰南京分公司",
+                    "120000",
+                    "20000",
+                    "20000",
+                    "50000",
+                    "30"
+                ]
+            },
+            {
+                "ID":"0000SFDL",
+                "childNodeType": "leaf",
+                "childData": [
+                    "",
+                    "顺丰大连分公司",
+                    "30000",
+                    "20000",
+                    "20000",
+                    "50000",
+                    "20"
+                ]
+            }
+        ],
+        "0000SFBJ": [
+            {
+                "ID":"0000SFBJ01",
+                "childNodeType": "leaf",
+                "childData": [
+                    "",
+                    "顺丰北京车队01",
+                    "80000",
+                    "30000",
+                    "20000",
+                    "60000",
+                    "30"
+                ]
+            },
+            {
+                "ID":"0000SFBJ02",
+                "childNodeType": "leaf",
+                "childData": [
+                    "",
+                    "顺丰北京车队02",
+                    "70000",
+                    "30000",
+                    "20000",
+                    "40000",
+                    "20"
+                ]
+            }
+        ]
+    }
+};
+
+$(function(){
+    $.ajax({
+        url:'echo.php',
+        type:"post",
+        timeout:10000,
+        async:true,
+        data:{
+            json:JSON.stringify(postData)
+        },
+        dataType:"json",
+        beforeSend:function(){
+            console.log('请求已经发出');
+            $('#loadingImage').show();
+        },
+        success:function(jsonData, textStatus){
+            renderHtml(jsonData);
+        },
+        error:function(XMLHttpRequest, textStatus, errorThrown){
+            console.log(textStatus+":"+errorThrown);
+        }
+    });
+
+    function renderHtml(jsonData){
+        $('#loadingImage').hide();
+        var tBodyGen = $('#tBodyGen');
+        var str = '';
+        str += '<tr data-tt-id="'+jsonData.rootId.ID+'" data-tt-branch="true"><td>'+jsonData.rootId.date+'</td>';
+        str += '<td>'+jsonData.rootId.text+'</td>';
+        str += '<td><a href="#">'+jsonData.rootId.chargeAll+'</a></td>';
+        str += '<td><a href="#">'+jsonData.rootId.aloAll+'</a></td>';
+        str += '<td><a href="#">'+jsonData.rootId.costAll+'</a></td>';
+        str += '<td><a href="#">'+jsonData.rootId.oilAll+'</a></td>';
+        str += '<td><a href="#">'+jsonData.rootId.oilTimes+'</a></td>';
+        str += '</tr>';
+
+        tBodyGen.html(str);
+
+        $("#example-basic").treetable({
+            expandable:     true,
+            onNodeExpand:   nodeExpand,
+            onNodeCollapse: nodeCollapse,
+            column:1
+        });
+
+        $("#example-basic").treetable("reveal", '1');
+
+        $("#example-basic tbody").on("mousedown", "tr", function() {
+            $(".selected").not(this).removeClass("selected");
+            $(this).toggleClass("selected");
+        });
+
+        function nodeExpand () {
+            //console.log("Expanded: " + this.id);
+            getNodeViaAjax(this.id,jsonData);
+        }
+
+        function nodeCollapse () {
+            // alert("Collapsed: " + this.id);
+        }
+
+    }
+
+
+
+    function getNodeViaAjax(parentNodeID,jsonData) {
+        var childNodes = jsonData.nodeID[parentNodeID];
+
+        if(childNodes) {
+            var parentNode = $("#example-basic").treetable("node", parentNodeID);
+
+            for (var i = 0; i < childNodes.length; i++) {
+                var node = childNodes[i];
+                var nodeToAdd = $("#example-basic").treetable("node",node['ID']);
+
+                if(!nodeToAdd) {
+                    var row ='<tr data-tt-id="' +
+                        node['ID'] +
+                        '" data-tt-parent-id="' +
+                        parentNodeID + '" ';
+                    if(node['childNodeType'] == 'branch') {
+                        row += ' data-tt-branch="true" ';
+                    }
+                    row += ' >';
+
+                    for (var index in node['childData']) {
+                        var data = node['childData'][index];
+                        if(!isNaN(parseFloat(data))){
+                            row += "<td><a href='#'>" + data + "</a></td>";
+                        }else{
+                            row += "<td><em class='text_title'>" + data + "</em></td>";
+                        }
+                    }
+
+                    row +="</tr>";
+                    $("#example-basic").treetable("loadBranch", parentNode, row);
+                }
+
+            }
+        }
+    }
+});
+
+
+</script>
